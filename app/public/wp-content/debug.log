@@ -1,0 +1,106 @@
+[08-May-2026 21:27:07 UTC] PHP Warning:  mysqli_real_connect(): (HY000/2002): No such file or directory in /home/danish-qureshi/Local Sites/cloths/app/public/wp-includes/class-wpdb.php on line 1994
+[08-May-2026 21:27:07 UTC] PHP Warning:  mysqli_real_connect(): (HY000/2002): No such file or directory in /home/danish-qureshi/Local Sites/cloths/app/public/wp-includes/class-wpdb.php on line 1994
+[08-May-2026 21:33:22 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:33:22 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:33:22 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:33:28 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:33:28 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:33:30 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:33:30 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:34:14 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:34:14 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:34:14 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:34:14 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:34:15 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:35:51 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:35:51 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:35:53 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:35:53 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:35:54 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:35:56 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:35:57 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:35:57 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:36:02 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:36:05 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:36:06 UTC] CHECKOUT SUCCESS
+[08-May-2026 21:36:06 UTC] Array
+(
+    [order_id] => 18
+    [email] => one@two.com
+    [city] => Sheopur
+)
+
+[08-May-2026 21:36:06 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:36:57 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:36:57 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:36:59 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:37:02 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:38:51 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:38:51 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:39:51 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:39:51 UTC] TEST HOOK PLUGIN LOADED
+[08-May-2026 21:51:35 UTC] Automatic updates starting...
+[08-May-2026 21:51:35 UTC] Automatic updates complete.
+[08-May-2026 21:54:43 UTC] PHP Notice:  Function _load_textdomain_just_in_time was called <strong>incorrectly</strong>. Translation loading for the <code>woocommerce</code> domain was triggered too early. This is usually an indicator for some code in the plugin or theme running too early. Translations should be loaded at the <code>init</code> action or later. Please see <a href="https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/">Debugging in WordPress</a> for more information. (This message was added in version 6.7.0.) in /home/danish-qureshi/Local Sites/cloths/app/public/wp-includes/functions.php on line 6131
+[09-May-2026 00:01:24 UTC] PHP Notice:  Function _load_textdomain_just_in_time was called <strong>incorrectly</strong>. Translation loading for the <code>woocommerce</code> domain was triggered too early. This is usually an indicator for some code in the plugin or theme running too early. Translations should be loaded at the <code>init</code> action or later. Please see <a href="https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/">Debugging in WordPress</a> for more information. (This message was added in version 6.7.0.) in /home/danish-qureshi/Local Sites/cloths/app/public/wp-includes/functions.php on line 6131
+[09-May-2026 08:46:54 UTC] STORE API DRAFT ORDER UPDATED
+[09-May-2026 08:46:54 UTC] Array
+(
+    [id] => 20
+    [status] => checkout-draft
+    [email] => one@two.com
+    [first_name] => hellooooooooooooo
+    [last_name] => worldddddddddddddddddd
+    [city] => Sheopur
+)
+
+[09-May-2026 08:46:54 UTC] DRAFT ORDER UPDATED
+[09-May-2026 08:46:54 UTC] Array
+(
+    [order_id] => 20
+    [status] => checkout-draft
+    [email] => one@two.com
+    [first_name] => hellooooooooooooo
+    [last_name] => worldddddddddddddddddd
+    [city] => Sheopur
+    [address_1] => something
+    [context] => checkout_block_draft
+)
+
+[09-May-2026 08:46:55 UTC] CHECKOUT SUCCESS
+[09-May-2026 08:46:55 UTC] Array
+(
+    [order_id] => 20
+    [email] => one@two.com
+    [city] => Sheopur
+)
+
+[09-May-2026 08:58:55 UTC] HOOK FIRED
+[09-May-2026 08:58:55 UTC] Array
+(
+    [email] => foo@bar.commmmm
+)
+
+[09-May-2026 08:58:55 UTC] DRAFT ORDER UPDATED
+[09-May-2026 08:58:55 UTC] Array
+(
+    [order_id] => 21
+    [status] => checkout-draft
+    [email] => foo@bar.commmmm
+    [first_name] => foobar
+    [last_name] => barbaz
+    [city] => Sheopur
+    [address_1] => baz
+    [context] => checkout_block_draft
+)
+
+[09-May-2026 08:58:55 UTC] CHECKOUT SUCCESS
+[09-May-2026 08:58:55 UTC] Array
+(
+    [order_id] => 21
+    [email] => foo@bar.commmmm
+    [city] => Sheopur
+)
+
+[09-May-2026 09:57:17 UTC] Automatic updates starting...
+[09-May-2026 09:57:17 UTC] Automatic updates complete.
