@@ -1,0 +1,55 @@
+.Menu {
+  padding: 8px 0px 8px 0px;
+  width: 180px;
+  height: 80px;
+
+  .Menu-Item {
+    cursor: pointer;
+    display: flex;
+    gap: 8px;
+    padding: 8px 4px;
+    align-items: center;
+    /* font-family: inter; */
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    text-align: left;
+
+    img {
+      width: 16px;
+      height: 16px;
+      align-items: center;
+    }
+  }
+}
+.firstCol {
+  width: 56px;
+  img {
+    margin-left: 12px;
+    height: 20px;
+    width: 20px;
+  }
+}
+.TableHeader {
+  font-size: 12px !important;
+  line-height: 16px !important;
+  font-weight: 400 !important;
+  /* font-family: inter !important; */
+  color: #475467 !important;
+  min-width: 150px !important;
+}
+.tableDetails {
+  width: 120px;
+}
+.tableNarrow {
+  width: 80px !important;
+  min-width: 80px !important;
+}
+
+.tableSubject {
+  width: auto !important;
+  min-width: 200px !important;
+}
+.TableCell {
+  font-weight: 600 !important;
+}
