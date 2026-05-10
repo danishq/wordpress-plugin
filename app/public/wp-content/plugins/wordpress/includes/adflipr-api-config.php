@@ -18,7 +18,7 @@
 defined('ABSPATH') || exit;
 
 if (! defined('ADFLIPR_API_BASE_URL')) {
-  define('ADFLIPR_API_BASE_URL', apply_filters('adflipr_api_base_url', 'https://adflipr.com'));
+  define('ADFLIPR_API_BASE_URL', apply_filters('adflipr_api_base_url', 'https://dev.adflipr.com'));
 }
 
 if (! function_exists('adflipr_api_url')) {

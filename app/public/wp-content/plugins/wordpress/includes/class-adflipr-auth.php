@@ -25,12 +25,15 @@ if (! class_exists('AdFlipr_Auth')) {
 
       $data     = $this->get_or_create_valid_woocommerce_api_key();
       $data     = array_merge(['site_url' => site_url(), 'from' => 'wordpress'], $data);
-      $login_url = defined('ADFLIPR_API_WP_USERS_LOGIN_URL') ? ADFLIPR_API_WP_USERS_LOGIN_URL : ADFLIPR_API_USERS_LOGIN_URL;
+      $login_url = ADFLIPR_API_USERS_LOGIN_URL;
+      $this->debug_log('Login request prepared', [
+        'endpoint' => $login_url,
+        'auth_flow' => 'normal_web_login',
+      ]);
       $response  = wp_remote_post($login_url, [
         'body'    => wp_json_encode([
           'email'       => $email,
           'password'    => $password,
-          'context'     => defined('ADFLIPR_LOGIN_CONTEXT_WORDPRESS') ? ADFLIPR_LOGIN_CONTEXT_WORDPRESS : 'WORDPRESS',
           'queryParams' => $data,
         ]),
         'headers' => ['Content-Type' => 'application/json'],
@@ -44,39 +47,38 @@ if (! class_exists('AdFlipr_Auth')) {
 
       if (is_wp_error($response)) {
         $result['message'] = __('Authentication Failed : ' . $response->get_error_message(), 'adflipr');
+        $this->debug_log('Login request failed', [
+          'endpoint' => $login_url,
+          'error' => $response->get_error_code(),
+        ]);
 
         return $result;
       }
+
+      $this->debug_log('Login response received', [
+        'endpoint' => $login_url,
+        'status_code' => (int) wp_remote_retrieve_response_code($response),
+      ]);
 
       $response_body = json_decode(wp_remote_retrieve_body($response), true);
 
       if (! is_array($response_body)) {
+        $this->debug_log('Login response was not JSON object', [
+          'endpoint' => $login_url,
+        ]);
         return $result;
       }
 
-      // JWT session login (/api/v1/users/login) uses loginToken + tokenExpiry.
+      // Normal web login (/api/v1/users/login) uses loginToken + tokenExpiry.
       if (! empty($response_body['loginToken'])) {
         $this->token        = $response_body['loginToken'];
-        $this->token_expiry = isset($response_body['tokenExpiry']) ? $response_body['tokenExpiry'] : null;
-        update_option('adflipr_auth_token', $this->token);
-        update_option('adflipr_token_expiry', $this->token_expiry);
-        $result = [
-          'status'  => true,
-          'message' => __('Authentication successful.', 'adflipr'),
-        ];
-
-        return $result;
-      }
-
-      // WordPress integration login (/api/v1/wp/users/login + context WORDPRESS) returns type wp_token and JSON "token".
-      if (! empty($response_body['token']) && isset($response_body['type']) && $response_body['type'] === 'wp_token') {
-        $this->token = $response_body['token'];
-        if (! empty($response_body['tokenExpiry'])) {
-          $this->token_expiry = $response_body['tokenExpiry'];
-        } else {
-          $ttl_sec            = (defined('YEAR_IN_SECONDS') ? YEAR_IN_SECONDS : 31536000) * 10;
-          $this->token_expiry = (time() + $ttl_sec) * 1000;
-        }
+        $this->token_expiry = $this->normalize_token_expiry(
+          isset($response_body['tokenExpiry']) ? $response_body['tokenExpiry'] : null
+        );
+        $this->debug_log('Login token received', array_merge([
+          'token_type' => 'normal_loginToken',
+          'has_token_expiry' => ! empty($this->token_expiry),
+        ], $this->describe_token($this->token)));
         update_option('adflipr_auth_token', $this->token);
         update_option('adflipr_token_expiry', $this->token_expiry);
         $result = [
@@ -90,6 +92,12 @@ if (! class_exists('AdFlipr_Auth')) {
       if (isset($response_body['message'])) {
         $result['message'] = is_string($response_body['message']) ? $response_body['message'] : wp_json_encode($response_body['message']);
       }
+      $this->debug_log('Login response missing normal loginToken', [
+        'endpoint' => $login_url,
+        'response_type' => isset($response_body['type']) ? $response_body['type'] : null,
+        'has_loginToken' => ! empty($response_body['loginToken']),
+        'has_legacy_token_field' => ! empty($response_body['token']),
+      ]);
 
       return $result;
     }
@@ -345,9 +353,15 @@ if (! class_exists('AdFlipr_Auth')) {
     public function handle_internal_api_get_request($path, $params = [])
     {
       $url = adflipr_api_url('api/v1/' . ltrim((string) $path, '/')) . '?' . http_build_query($params);
+      $token = $this->get_token();
+      $this->debug_log('Proxy request prepared', [
+        'method' => 'GET',
+        'path' => 'api/v1/' . ltrim((string) $path, '/'),
+        'authorization_length' => is_string($token) ? strlen($token) : 0,
+      ]);
       $response = wp_remote_get($url, [
         'headers' => [
-          'Authorization' => $this->get_token()
+          'Authorization' => $token
         ],
         'timeout' => $this->ADFLIPR_TIMEOUT,
       ]);
@@ -358,6 +372,12 @@ if (! class_exists('AdFlipr_Auth')) {
     public function handle_internal_api_request($path, $method, $params = [])
     {
       $url = adflipr_api_url('api/v1/' . ltrim((string) $path, '/'));
+      $token = $this->get_token();
+      $this->debug_log('Proxy request prepared', [
+        'method' => $method,
+        'path' => 'api/v1/' . ltrim((string) $path, '/'),
+        'authorization_length' => is_string($token) ? strlen($token) : 0,
+      ]);
       $body = '';
       if (is_array($params)) {
         $body = wp_json_encode($params);
@@ -367,7 +387,7 @@ if (! class_exists('AdFlipr_Auth')) {
 
       $response = wp_remote_request($url, [
         'headers' => [
-          'Authorization' => $this->get_token(),
+          'Authorization' => $token,
           'Content-Type'  => 'application/json'
         ],
         'method' => $method,
@@ -397,6 +417,9 @@ if (! class_exists('AdFlipr_Auth')) {
       $code = (int) wp_remote_retrieve_response_code($response);
       $body = wp_remote_retrieve_body($response);
       $decoded = json_decode($body, true);
+      $this->debug_log('Proxy response received', [
+        'status_code' => $code,
+      ]);
 
       if (! is_array($decoded)) {
         $decoded = array(
@@ -490,6 +513,66 @@ if (! class_exists('AdFlipr_Auth')) {
     private function rest_require_wp_nonce($request)
     {
       return adflipr_rest_verify_wp_nonce_header($request);
+    }
+
+    /**
+     * Safe token diagnostics for temporary auth debugging. Never logs token contents.
+     *
+     * @param mixed $token
+     * @return array<string, mixed>
+     */
+    private function describe_token($token)
+    {
+      $token = is_string($token) ? trim($token) : '';
+      $decoded = base64_decode($token, true);
+      $decoded_string = is_string($decoded) ? $decoded : '';
+
+      return [
+        'token_length' => strlen($token),
+        'is_64_char_hex' => (bool) preg_match('/^[a-f0-9]{64}$/i', $token),
+        'is_base64_like' => (bool) preg_match('/^[A-Za-z0-9+\/=]+$/', $token),
+        'base64_decode_success' => $decoded !== false,
+        'base64_decodes_to_uuid' => (bool) preg_match(
+          '/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i',
+          $decoded_string
+        ),
+      ];
+    }
+
+    /**
+     * Store token expiry as epoch milliseconds because is_token_expired() compares in ms.
+     *
+     * @param mixed $token_expiry
+     * @return int|null
+     */
+    private function normalize_token_expiry($token_expiry)
+    {
+      if (is_int($token_expiry) || is_float($token_expiry) || (is_string($token_expiry) && is_numeric($token_expiry))) {
+        $expiry = (int) $token_expiry;
+        return $expiry < 100000000000 ? $expiry * 1000 : $expiry;
+      }
+
+      if (is_string($token_expiry) && $token_expiry !== '') {
+        $timestamp = strtotime($token_expiry);
+        if ($timestamp !== false) {
+          return $timestamp * 1000;
+        }
+      }
+
+      return null;
+    }
+
+    /**
+     * Wrapper keeps this class safe if debug helpers are not loaded.
+     *
+     * @param string $message
+     * @param array<string, mixed> $context
+     */
+    private function debug_log($message, array $context = [])
+    {
+      if (function_exists('adflipr_debug_log')) {
+        adflipr_debug_log($message, $context);
+      }
     }
 
     public function api_permissions_check($request)
